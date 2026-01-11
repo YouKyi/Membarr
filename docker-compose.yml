@@ -1,8 +1,7 @@
 services:
   membarr:
-    image: 'membarr:latest'
-    build: .
-    hostname: bot-discord
+    image: 'ghcr.io/youkyi/membarr:latest'
+    hostname: bot-discord-membarr
     volumes:
       - membarr:/app/app/config
     environment:
