@@ -4,23 +4,23 @@ import discord
 async def embederror(recipient, message, ephemeral=True, message_fr=None):
     """Send error message in English and French"""
     # English message with flag
-    embed_en = discord.Embed(title="🇬🇧 ERROR", description=message, color=0xf50000)
+    embed_en = discord.Embed(title="🇬🇧 ERROR", description=message, color=0xf54242)
     await send_embed(recipient, embed_en, ephemeral)
     
     # French message with flag (if provided, otherwise use English)
     french_msg = message_fr if message_fr else message
-    embed_fr = discord.Embed(title="🇫🇷 ERREUR", description=french_msg, color=0xf50000)
+    embed_fr = discord.Embed(title="🇫🇷 ERREUR", description=french_msg, color=0xf54242)
     await send_embed_followup(recipient, embed_fr)
 
 async def embedinfo(recipient, message, ephemeral=True, message_fr=None):
     """Send info message in English and French"""
     # English message with flag
-    embed_en = discord.Embed(title="🇬🇧 " + message, color=0x00F500)
+    embed_en = discord.Embed(title="🇬🇧 " + message, color=0x4266f5)
     await send_embed(recipient, embed_en, ephemeral)
     
     # French message with flag (if provided, otherwise use English)
     french_msg = message_fr if message_fr else message
-    embed_fr = discord.Embed(title="🇫🇷 " + french_msg, color=0x00F500)
+    embed_fr = discord.Embed(title="🇫🇷 " + french_msg, color=0x4266f5)
     await send_embed_followup(recipient, embed_fr)
 
 async def embedcustom(recipient, title, fields, ephemeral=True, title_fr=None, fields_fr=None):
