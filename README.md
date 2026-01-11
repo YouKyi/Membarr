@@ -1,129 +1,133 @@
-[![Discord](https://img.shields.io/discord/997761163020488815?color=7289DA&label=Discord&style=for-the-badge&logo=discord)](https://discord.gg/7hAUKKTyTd)
-[![DockerHub](https://img.shields.io/badge/Docker-Hub-%23099cec?style=for-the-badge&logo=docker)](https://hub.docker.com/r/yoruio/membarr)
-![Docker Pulls](https://img.shields.io/docker/pulls/yoruio/membarr?color=099cec&style=for-the-badge)
-[![docker-sync](https://github.com/Yoruio/Membarr/actions/workflows/docker-sync.yml/badge.svg)](https://github.com/Yoruio/Membarr/actions/workflows/docker-sync.yml)
+# Membarr
 
-Membarr 
-=================
+[![Docker](https://img.shields.io/badge/Docker-GHCR-%23099cec?style=for-the-badge&logo=docker)](https://ghcr.io/youkyi/membarr)
+[![GitHub Actions](https://img.shields.io/github/actions/workflow/status/YouKyi/Membarr/docker-build.yml?style=for-the-badge&logo=github)](https://github.com/YouKyi/Membarr/actions)
 
-Membarr is a fork of Invitarr that invites discord users to Plex and Jellyfin. You can also automate this bot to invite discord users to a media server once a certain role is given to a user or the user can also be added manually.  
+Membarr is a Discord bot that invites users to Plex and Jellyfin. You can automate this bot to invite discord users to a media server once a certain role is given to a user, or add users manually.
 
-### Features
+> **Fork maintained by [YouKyi](https://github.com/YouKyi)** - Originally forked from [Invitarr](https://github.com/Sleepingpirates/Invitarr) by Sleepingpirates, then [Membarr](https://github.com/Yoruio/Membarr) by Yoruio.
 
-- Ability to invite users to Plex and Jellyfin from discord 
-- Fully automatic invites using roles 
-- Ability to kick users from plex if they leave the discord server or if their role is taken away.
-- Ability to view the database in discord and to edit it.
+## Features
 
-Commands: 
+- 🎬 Invite users to **Plex** and **Jellyfin** from Discord
+- 🤖 Fully automatic invites using Discord roles
+- 🚪 Auto-remove users from Plex/Jellyfin when they leave the server or lose their role
+- 📊 View and edit the database directly from Discord
+- 🌐 **Bilingual messages** - All user messages are sent in English 🇬🇧 and French 🇫🇷
+- 🎥 **Seer Request URL** - Optionally send users a link to your Overseerr/Jellyseerr instance
 
-```
-/plex invite <email>
-This command is used to add an email to plex
-/plex remove <email>
-This command is used to remove an email from plex
-/jellyfin invite <jellyfin username>
-This command is used to add a user to Jellyfin.
-/jellyfin remove <jellyfin username>
-This command is used to remove a user from Jellyfin.
-/membarr dbls
-This command is used to list Membarr's database
-/membarr dbadd <@user> <optional: plex email> <optional: jellyfin username>
-This command is used to add exsisting  plex emails, jellyfin users and discord id to the DB.
-/membarr dbrm <position>
-This command is used to remove a record from the Db. Use /membarr dbls to determine record position. ex: /membarr dbrm 1
-```
-# Creating Discord Bot
-1. Create the discord server that your users will get member roles or use an existing discord that you can assign roles from
-2. Log into https://discord.com/developers/applications and click 'New Application'
-3. (Optional) Add a short description and an icon for the bot. Save changes.
-4. Go to 'Bot' section in the side menu
-5. Uncheck 'Public Bot' under Authorization Flow
-6. Check all 3 boxes under Privileged Gateway Intents: Presence Intent, Server Members Intent, Message Content Intent. Save changes.
-7. Copy the token under the username or reset it to copy. This is the token used in the docker image.
-8. Go to 'OAuth2' section in the side menu, then 'URL Generator'
-9. Under Scopes, check 'bot' and applications.commands
-10. Copy the 'Generated URL' and paste into your browser and add it to your discord server from Step 1.
-11. The bot will come online after the docker container is running with the correct Bot Token
-
-
-# Unraid Installation
-> For Manual an Docker setup, see below
-
-1. Ensure you have the Community Applications plugin installed.
-2. Inside the Community Applications app store, search for Membarr.
-3. Click the Install Button.
-4. Add discord bot token.
-5. Click apply
-6. Finish setting up using [Setup Commands](#after-bot-has-started)
-
-# Manual Setup (For Docker, see below)
-
-**1. Enter discord bot token in bot.env**
-
-**2. Install requirements**
+## Commands
 
 ```
-pip3 install -r requirements.txt 
-```
-**3. Start the bot**
-```
-python3 Run.py
-```
-
-# Docker Setup & Start
-To run Membarr in Docker, run the following command, replacing [path to config] with the absolute path to your bot config folder:
-```
-docker run -d --restart unless-stopped --name membarr -v /[path to config]:/app/app/config -e "token=YOUR_DISCORD_TOKEN_HERE" yoruio/membarr:latest
+/plex invite <email>          - Add an email to Plex
+/plex remove <email>          - Remove an email from Plex
+/jellyfin invite <username>   - Add a user to Jellyfin
+/jellyfin remove <username>   - Remove a user from Jellyfin
+/membarr dbls                 - List Membarr's database
+/membarr dbadd <@user> <email> <jellyfin_username>  - Add existing users to DB
+/membarr dbrm <position>      - Remove a record from the DB
 ```
 
-# After bot has started 
+## Quick Start with Docker
 
-# Plex Setup Commands: 
+### Docker Compose (Recommended)
+
+```yaml
+services:
+  membarr:
+    image: ghcr.io/youkyi/membarr:latest
+    container_name: membarr
+    volumes:
+      - membarr_config:/app/app/config
+    environment:
+      - token=YOUR_DISCORD_BOT_TOKEN
+      - seer_request_url=https://your-overseerr-url.com  # Optional
+      - discord_language=both  # Options: both, en, fr
+    restart: unless-stopped
+
+volumes:
+  membarr_config:
+```
+
+### Docker Run
+
+```bash
+docker run -d \
+  --name membarr \
+  --restart unless-stopped \
+  -v /path/to/config:/app/app/config \
+  -e "token=YOUR_DISCORD_BOT_TOKEN" \
+  -e "seer_request_url=https://your-overseerr-url.com" \
+  -e "discord_language=both" \
+  ghcr.io/youkyi/membarr:latest
+```
+
+## Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `token` | ✅ Yes | Discord bot token |
+| `seer_request_url` | ❌ No | URL to your Overseerr/Jellyseerr for movie requests |
+| `discord_language` | ❌ No | Language mode: `both` (EN+FR), `en` (English only), `fr` (French only). Default: `both` |
+
+## Creating a Discord Bot
+
+1. Go to [Discord Developer Portal](https://discord.com/developers/applications) and click 'New Application'
+2. Go to **Bot** section → Uncheck 'Public Bot'
+3. Enable all 3 **Privileged Gateway Intents**: Presence, Server Members, Message Content
+4. Copy the bot token
+5. Go to **OAuth2** → **URL Generator**
+6. Check `bot` and `applications.commands` scopes
+7. Copy the generated URL and add the bot to your server
+
+## Setup Commands
+
+### Plex Setup
 
 ```
 /plexsettings setup <username> <password> <server name>
-This command is used to setup plex login. 
-/plexsettings addrole <@role>
-These role(s) will be used as the role(s) to automatically invite user to plex
-/plexsettings removerole <@role>
-This command is used to remove a role that is being used to automatically invite uses to plex
-/plexsettings setuplibs <libraries>
-This command is used to setup plex libraries. Default is set to all. Libraries is a comma separated list.
-/plexsettings enable
-This command enables the Plex integration (currently only enables auto-add / auto-remove)
-/plexsettings disable
-This command disables the Plex integration (currently only disables auto-add / auto-remove)
+/plexsettings addrole <@role>       - Set auto-invite role
+/plexsettings removerole <@role>    - Remove auto-invite role
+/plexsettings setuplibs <libraries> - Set libraries (comma-separated)
+/plexsettings enable                - Enable Plex integration
+/plexsettings disable               - Disable Plex integration
 ```
 
-# Jellyfin Setup Commands:
+### Jellyfin Setup
+
 ```
-/jellyfinsettings setup <server url> <api key> <optional: external server url (default: server url)>
-This command is used to setup the Jellyfin server. The external server URL is the URL that is sent to users to log into your Jellyfin server.
-/jellyfinsettings addrole <@role>
-These role(s) will be used as the role(s) to automatically invite user to Jellyfin
-/jellyfinsettings removerole <@role>
-This command is used to remove a role that is being used to automatically invite uses to Jellyfin
-/jellyfinsettings setuplibs <libraries>
-This command is used to setup Jellyfin libraries. Default is set to all. Libraries is a comma separated list.
-/jellyfinsettings enable
-This command enables the Jellyfin integration (currently only enables auto-add / auto-remove)
-/jellyfinsettings disable
-This command disables the Jellyfin integration (currently only disables auto-add / auto-remove)
+/jellyfinsettings setup <server url> <api key> <optional: external url>
+/jellyfinsettings addrole <@role>       - Set auto-invite role
+/jellyfinsettings removerole <@role>    - Remove auto-invite role
+/jellyfinsettings setuplibs <libraries> - Set libraries (comma-separated)
+/jellyfinsettings enable                - Enable Jellyfin integration
+/jellyfinsettings disable               - Disable Jellyfin integration
 ```
 
-# Migration from Invitarr
-Invitarr does not require the applications.commands scope, so you will need to kick and reinvite your Discord bot to your server, making sure to tick both the "bot" and "applications.commands" scopes in the Oauth URL generator.
+## Manual Setup
 
-Membarr uses a slightly different database table than Invitarr. Membarr will automatically update the Invitarr db table to the current Membarr table format, but the new table will no longer be compatible with Invitarr, so backup your app.db before running Membarr!
+1. Clone the repository
+2. Add your Discord bot token to `bot.env`:
+   ```
+   discord_bot_token=YOUR_TOKEN_HERE
+   seer_request_url=https://your-overseerr-url.com
+   discord_language=both
+   ```
+3. Install dependencies: `pip3 install -r requirements.txt`
+4. Start the bot: `python3 run.py`
 
-# Migration to Invitarr
-As mentioned in [Migration from Invitarr](#Migration-From-Invitarr), Membarr has a slightly different db table than Invitarr. To Switch back to Invitarr, you will have to manually change the table format back. Open app.db in a sqlite cli tool or browser like DB Browser, then remove the "jellyfin_username" column, and make the "email" column non-nullable.
+## Migration from Invitarr
 
-# Contributing
-We appreciate any and all contributions made to the project, whether that be new features, bugfixes, or even fixed typos! If you would like to contribute to the project, simply fork the development branch, make your changes, and open a pull request. *Pull requests that are not based on the development branch will be rejected.*
+Membarr uses a slightly different database table than Invitarr. The migration is automatic, but **backup your app.db before running Membarr** as the new format is not backwards compatible.
 
-# Other stuff
-**Enable Intents else bot will not Dm users after they get the role.**
-https://discordpy.readthedocs.io/en/latest/intents.html#privileged-intents
-**Discord Bot requires Bot and application.commands permission to fully function.**
+You will also need to reinvite your Discord bot with both `bot` and `applications.commands` scopes.
+
+## Contributing
+
+Contributions are welcome! Fork the `dev` branch, make your changes, and open a pull request.
+
+## Credits
+
+- Original [Invitarr](https://github.com/Sleepingpirates/Invitarr) by Sleepingpirates
+- [Membarr](https://github.com/Yoruio/Membarr) by Yoruio
+- Named by lordfransie

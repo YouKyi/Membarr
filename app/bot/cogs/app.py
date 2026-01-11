@@ -280,7 +280,7 @@ class app(commands.Cog):
                                 if SEER_REQUEST_URL:
                                     await embedinfo(after, f'To request new movies or series, go to: {SEER_REQUEST_URL}', message_fr=f'Pour demander de nouveaux films ou séries, rendez-vous sur : {SEER_REQUEST_URL}')
                             else:
-                                await embedinfo(after, 'There was an error adding this email address. Message Server Admin.', message_fr='Une erreur s\'est produite lors de l\'ajout de cette adresse email. Contactez l\'administrateur du serveur.')
+                                await embederror(after, 'There was an error adding this email address. Message Server Admin.', message_fr='Une erreur s\'est produite lors de l\'ajout de cette adresse email. Contactez l\'administrateur du serveur.')
                         plex_processed = True
                         break
 
@@ -296,7 +296,7 @@ class app(commands.Cog):
                                 #await secure.send(plexname + ' ' + after.mention + ' was removed from plex')
                             else:
                                 print("Cannot remove Plex from this user.")
-                            await embedinfo(after, "You have been removed from Plex", message_fr="Vous avez été supprimé de Plex")
+                            await embederror(after, "You have been removed from Plex", message_fr="Vous avez été supprimé de Plex")
                         except Exception as e:
                             print(e)
                             print("{} Cannot remove this user from plex.".format(email))
@@ -327,7 +327,7 @@ class app(commands.Cog):
                                 await embedcustom(after, "You have been added to Jellyfin!", {'Username': username, 'Password': f"||{password}||"}, title_fr="Vous avez été ajouté à Jellyfin !", fields_fr={'Nom d\'utilisateur': username, 'Mot de passe': f"||{password}||"})
                                 await embedinfo(after, f"Go to {JELLYFIN_EXTERNAL_URL} to log in!", message_fr=f"Rendez-vous sur {JELLYFIN_EXTERNAL_URL} pour vous connecter !")
                             else:
-                                await embedinfo(after, 'There was an error adding this user to Jellyfin. Message Server Admin.', message_fr='Une erreur s\'est produite lors de l\'ajout de cet utilisateur à Jellyfin. Contactez l\'administrateur du serveur.')
+                                await embederror(after, 'There was an error adding this user to Jellyfin. Message Server Admin.', message_fr='Une erreur s\'est produite lors de l\'ajout de cet utilisateur à Jellyfin. Contactez l\'administrateur du serveur.')
                         jellyfin_processed = True
                         break
 
@@ -344,7 +344,7 @@ class app(commands.Cog):
                                 #await secure.send(plexname + ' ' + after.mention + ' was removed from plex')
                             else:
                                 print("Cannot remove Jellyfin from this user")
-                            await embedinfo(after, "You have been removed from Jellyfin", message_fr="Vous avez été supprimé de Jellyfin")
+                            await embederror(after, "You have been removed from Jellyfin", message_fr="Vous avez été supprimé de Jellyfin")
                         except Exception as e:
                             print(e)
                             print("{} Cannot remove this user from Jellyfin.".format(username))
