@@ -296,7 +296,7 @@ class app(commands.Cog):
                                 #await secure.send(plexname + ' ' + after.mention + ' was removed from plex')
                             else:
                                 print("Cannot remove Plex from this user.")
-                            await embedinfo(after, "You have been removed from Plex", message_fr="Vous avez été supprimé de Plex")
+                            await embederror(after, "You have been removed from Plex", message_fr="Vous avez été supprimé de Plex")
                         except Exception as e:
                             print(e)
                             print("{} Cannot remove this user from plex.".format(email))
@@ -344,7 +344,7 @@ class app(commands.Cog):
                                 #await secure.send(plexname + ' ' + after.mention + ' was removed from plex')
                             else:
                                 print("Cannot remove Jellyfin from this user")
-                            await embedinfo(after, "You have been removed from Jellyfin", message_fr="Vous avez été supprimé de Jellyfin")
+                            await embederror(after, "You have been removed from Jellyfin", message_fr="Vous avez été supprimé de Jellyfin")
                         except Exception as e:
                             print(e)
                             print("{} Cannot remove this user from Jellyfin.".format(username))
