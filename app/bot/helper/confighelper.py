@@ -29,6 +29,7 @@ jellyfin_libs = ""
 jellyfin_roles = None
 plex_configured = True
 jellyfin_configured = True
+SEER_REQUEST_URL = None
 
 switch = 0 
 
@@ -38,7 +39,8 @@ if(path.exists('bot.env')):
     try:
         load_dotenv(dotenv_path='bot.env')
         # settings
-        Discord_bot_token = environ.get('discord_bot_token')            
+        Discord_bot_token = environ.get('discord_bot_token')
+        SEER_REQUEST_URL = environ.get('seer_request_url')
         switch = 1
     
     except Exception as e:
@@ -49,6 +51,18 @@ try:
     switch = 1
 except Exception as e:
     pass
+
+# Check for seer_request_url from Docker environment variable
+try:
+    seer_request_url_env = os.environ.get('seer_request_url')
+    if seer_request_url_env:
+        SEER_REQUEST_URL = seer_request_url_env
+except Exception as e:
+    pass
+
+# Log info if SEER_REQUEST_URL is not defined
+if not SEER_REQUEST_URL:
+    print("Seer request URL is not defined. The request URL message will not be shown to users.")
 
 if not (path.exists(CONFIG_PATH)):
     with open (CONFIG_PATH, 'w') as fp:
