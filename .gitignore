@@ -5,3 +5,8 @@ __pycache__/
 mount
 .idea
 .venv
+
+# Docker local/test files
+compose.local.yml
+docker-compose.local.yml
+*.local.yml

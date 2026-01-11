@@ -1,0 +1,18 @@
+services:
+  membarr:
+    image: 'membarr:latest'
+    build: .
+    hostname: bot-discord
+    volumes:
+      - membarr:/app/app/config
+    environment:
+      # Discord bot token - REQUIRED
+      - token=YOUR_DISCORD_BOT_TOKEN_HERE
+      # Seer request URL - OPTIONAL (leave empty to disable)
+      - seer_request_url=https://seer-request-url.example.com
+    container_name: membarr
+    restart: unless-stopped
+
+volumes:
+  membarr:
+    driver: local
