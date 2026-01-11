@@ -30,6 +30,7 @@ jellyfin_roles = None
 plex_configured = True
 jellyfin_configured = True
 SEER_REQUEST_URL = None
+DISCORD_LANGUAGE = "both"  # Options: "both", "en", "fr"
 
 switch = 0 
 
@@ -60,9 +61,20 @@ try:
 except Exception as e:
     pass
 
+# Check for discord_language from Docker environment variable
+try:
+    discord_language_env = os.environ.get('discord_language')
+    if discord_language_env and discord_language_env.lower() in ['both', 'en', 'fr']:
+        DISCORD_LANGUAGE = discord_language_env.lower()
+except Exception as e:
+    pass
+
 # Log info if SEER_REQUEST_URL is not defined
 if not SEER_REQUEST_URL:
     print("Seer request URL is not defined. The request URL message will not be shown to users.")
+
+# Log language mode
+print(f"Discord language mode: {DISCORD_LANGUAGE}")
 
 if not (path.exists(CONFIG_PATH)):
     with open (CONFIG_PATH, 'w') as fp:
