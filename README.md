@@ -42,6 +42,7 @@ services:
     environment:
       - token=YOUR_DISCORD_BOT_TOKEN
       - seer_request_url=https://your-overseerr-url.com  # Optional
+      - discord_language=both  # Options: both, en, fr
     restart: unless-stopped
 
 volumes:
@@ -57,6 +58,7 @@ docker run -d \
   -v /path/to/config:/app/app/config \
   -e "token=YOUR_DISCORD_BOT_TOKEN" \
   -e "seer_request_url=https://your-overseerr-url.com" \
+  -e "discord_language=both" \
   ghcr.io/youkyi/membarr:latest
 ```
 
@@ -66,6 +68,7 @@ docker run -d \
 |----------|----------|-------------|
 | `token` | ✅ Yes | Discord bot token |
 | `seer_request_url` | ❌ No | URL to your Overseerr/Jellyseerr for movie requests |
+| `discord_language` | ❌ No | Language mode: `both` (EN+FR), `en` (English only), `fr` (French only). Default: `both` |
 
 ## Creating a Discord Bot
 
