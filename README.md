@@ -111,6 +111,7 @@ docker run -d \
    ```
    discord_bot_token=YOUR_TOKEN_HERE
    seer_request_url=https://your-overseerr-url.com
+   discord_language=both
    ```
 3. Install dependencies: `pip3 install -r requirements.txt`
 4. Start the bot: `python3 run.py`
