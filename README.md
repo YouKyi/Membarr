@@ -1,9 +1,8 @@
 # Membarr
 
 [![Docker](https://img.shields.io/badge/Docker-GHCR-%23099cec?style=for-the-badge&logo=docker)](https://ghcr.io/youkyi/membarr)
-[![GitHub Actions](https://img.shields.io/github/actions/workflow/status/YouKyi/Membarr/docker-build.yml?style=for-the-badge&logo=github)](https://github.com/YouKyi/Membarr/actions)
-[![Build and Push Docker Image](https://github.com/YouKyi/Membarr/actions/workflows/docker-build.yml/badge.svg)](https://github.com/YouKyi/Membarr/actions/workflows/docker-build.yml)
-[![CodeQL](https://github.com/YouKyi/Membarr/actions/workflows/codeql.yml/badge.svg)](https://github.com/YouKyi/Membarr/actions/workflows/codeql.yml)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/youkyi/Membarr/docker-build.yml?style=for-the-badge&logo=github&label=Build%20%26%20push%20docker)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/youkyi/Membarr/codeql.yml?style=for-the-badge&logo=github&label=CodeQL)
 
 Membarr is a Discord bot that invites users to Plex and Jellyfin. You can automate this bot to invite discord users to a media server once a certain role is given to a user, or add users manually.
 
