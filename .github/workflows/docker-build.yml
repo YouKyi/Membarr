@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  # On ne définit plus IMAGE_NAME ici car on va le définir dynamiquement en minuscule
 
 jobs:
   build-and-push:
@@ -17,14 +17,20 @@ jobs:
     permissions:
       contents: read
       packages: write
-      security-events: write # Autorise l'upload des rapports de sécurité
+      security-events: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # --- 1. LINTING (CORRIGÉ) ---
-      # failure-threshold: error -> Les warnings ne bloquent plus le build
+      # --- 🛠️ FIX : CONVERSION EN MINUSCULE ---
+      # Cette étape force le nom du repo (YouKyi/Membarr) en minuscule (youkyi/membarr)
+      # et le stocke dans la variable d'environnement IMAGE_NAME
+      - name: Lowercase Repo Name
+        run: |
+          echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> ${GITHUB_ENV}
+
+      # --- 1. LINTING ---
       - name: Lint Dockerfile (Hadolint)
         uses: hadolint/hadolint-action@v3.1.0
         with:
@@ -59,8 +65,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          load: true       # Charge l'image localement
-          push: false      # Ne pousse pas sur le registre
+          load: true       
+          push: false      
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:scan-tmp
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -71,12 +77,11 @@ jobs:
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:scan-tmp
           format: 'table'
-          exit-code: '1'        # Bloque si faille critique trouvée
+          exit-code: '1'        
           severity: 'CRITICAL,HIGH'
-          ignore-unfixed: true  # Ne bloque pas si aucun patch n'existe
+          ignore-unfixed: true 
 
       # --- 4. PUSH FINAL ---
-      # Ne s'exécute que si le scan précédent est VERT
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
