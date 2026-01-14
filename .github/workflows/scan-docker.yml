@@ -2,9 +2,9 @@ name: Docker Security Scan
 
 on:
   push:
-    branches: [development, staging, production]
+    branches: [master]
   pull_request:
-    branches: [development, staging, production]
+    branches: [master]
   workflow_dispatch:
 
 jobs:
