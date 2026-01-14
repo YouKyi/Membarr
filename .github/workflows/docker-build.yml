@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Secure Build and Push Docker Image
 
 on:
   push:
@@ -22,10 +22,19 @@ jobs:
     permissions:
       contents: read
       packages: write
+      # security-events: write # Décommente cette ligne si tu veux voir les résultats dans l'onglet "Security" de GitHub
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      # --- 🛡️ ÉTAPE DE SÉCURITÉ 1 : Linting du Dockerfile ---
+      # Vérifie les bonnes pratiques avant même de commencer le build
+      - name: Lint Dockerfile (Hadolint)
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+          failure-threshold: warning # Bloque si warning (tu peux mettre 'error' pour être moins strict)
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -50,6 +59,32 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value=latest,enable={{is_default_branch}}
 
+      # --- 🏗️ BUILD LOCAL POUR LE SCAN ---
+      # On build l'image ici avec "load: true" pour qu'elle soit accessible par le scanner
+      # On ne la pousse PAS encore.
+      - name: Build image locally for scanning
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true       # <--- Charge l'image dans le démon Docker local
+          push: false      # <--- Important : on ne pousse pas encore
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:scan-tmp # Tag temporaire
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # --- 🛡️ ÉTAPE DE SÉCURITÉ 2 : Scan de vulnérabilités ---
+      # Si Trivy trouve des failles CRITIQUES ou HAUTES, le pipeline s'arrête ici.
+      - name: Scan Docker Image (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.IMAGE_NAME }}:scan-tmp
+          format: 'table'
+          exit-code: '1'    # 🛑 Fait échouer le job si vulnérabilités trouvées
+          severity: 'CRITICAL,HIGH'
+          ignore-unfixed: true # (Optionnel) Ignore les failles qui n'ont pas encore de correctif
+
+      # --- 🚀 PUSH FINAL ---
+      # Si on arrive ici, l'image est "propre". On la re-build (instantané grâce au cache) et on push.
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
