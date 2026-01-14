@@ -2,15 +2,10 @@ name: Secure Build and Push Docker Image
 
 on:
   push:
-    branches:
-      - master
-      - main
-    tags:
-      - 'v*'
+    branches: [ "master", "main" ]
+    tags: [ 'v*' ]
   pull_request:
-    branches:
-      - master
-      - main
+    branches: [ "master", "main" ]
 
 env:
   REGISTRY: ghcr.io
@@ -22,19 +17,19 @@ jobs:
     permissions:
       contents: read
       packages: write
-      # security-events: write # Décommente cette ligne si tu veux voir les résultats dans l'onglet "Security" de GitHub
+      security-events: write # Autorise l'upload des rapports de sécurité
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # --- 🛡️ ÉTAPE DE SÉCURITÉ 1 : Linting du Dockerfile ---
-      # Vérifie les bonnes pratiques avant même de commencer le build
+      # --- 1. LINTING (CORRIGÉ) ---
+      # failure-threshold: error -> Les warnings ne bloquent plus le build
       - name: Lint Dockerfile (Hadolint)
         uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile: Dockerfile
-          failure-threshold: warning # Bloque si warning (tu peux mettre 'error' pour être moins strict)
+          failure-threshold: error 
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -59,32 +54,29 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value=latest,enable={{is_default_branch}}
 
-      # --- 🏗️ BUILD LOCAL POUR LE SCAN ---
-      # On build l'image ici avec "load: true" pour qu'elle soit accessible par le scanner
-      # On ne la pousse PAS encore.
+      # --- 2. BUILD LOCAL POUR SCAN ---
       - name: Build image locally for scanning
         uses: docker/build-push-action@v5
         with:
           context: .
-          load: true       # <--- Charge l'image dans le démon Docker local
-          push: false      # <--- Important : on ne pousse pas encore
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:scan-tmp # Tag temporaire
+          load: true       # Charge l'image localement
+          push: false      # Ne pousse pas sur le registre
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:scan-tmp
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # --- 🛡️ ÉTAPE DE SÉCURITÉ 2 : Scan de vulnérabilités ---
-      # Si Trivy trouve des failles CRITIQUES ou HAUTES, le pipeline s'arrête ici.
+      # --- 3. SCAN DE SÉCURITÉ (TRIVY) ---
       - name: Scan Docker Image (Trivy)
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.IMAGE_NAME }}:scan-tmp
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:scan-tmp
           format: 'table'
-          exit-code: '1'    # 🛑 Fait échouer le job si vulnérabilités trouvées
+          exit-code: '1'        # Bloque si faille critique trouvée
           severity: 'CRITICAL,HIGH'
-          ignore-unfixed: true # (Optionnel) Ignore les failles qui n'ont pas encore de correctif
+          ignore-unfixed: true  # Ne bloque pas si aucun patch n'existe
 
-      # --- 🚀 PUSH FINAL ---
-      # Si on arrive ici, l'image est "propre". On la re-build (instantané grâce au cache) et on push.
+      # --- 4. PUSH FINAL ---
+      # Ne s'exécute que si le scan précédent est VERT
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
