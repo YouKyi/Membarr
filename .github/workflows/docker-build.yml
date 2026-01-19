@@ -31,7 +31,7 @@ jobs:
       # --- 1. LINTING (Optionnel mais recommandé) ---
       # Vérifie juste que le Dockerfile est valide, sans bloquer
       - name: Lint Dockerfile (Hadolint)
-        uses: hadolint/hadolint-action@v3.1.0
+        uses: hadolint/hadolint-action@v3.3.0
         with:
           dockerfile: Dockerfile
           failure-threshold: error
