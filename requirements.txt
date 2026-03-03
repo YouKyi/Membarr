@@ -3,4 +3,4 @@ PlexAPI==4.18.0
 texttable
 python-dotenv
 requests
-discord.py==2.6.4
+discord.py==2.7.0
