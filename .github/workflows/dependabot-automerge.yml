@@ -1,0 +1,31 @@
+name: Dependabot Auto-Merge
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  automerge:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Fetch Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Auto-merge patch et minor uniquement — major nécessite une review manuelle
+      - name: Approve and auto-merge
+        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
+        run: |
+          gh pr review "$PR_URL" --approve --body "Auto-approved (dependabot ${{ steps.metadata.outputs.update-type }})"
+          gh pr merge "$PR_URL" --auto --merge
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
