@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       # --- 🛠️ FIX : CONVERSION NOM EN MINUSCULE ---
       - name: Lowercase Repo Name
