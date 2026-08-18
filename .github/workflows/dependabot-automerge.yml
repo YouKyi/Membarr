@@ -5,27 +5,30 @@ on:
     types: [opened, synchronize, reopened]
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   automerge:
     if: github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
 
     steps:
       - name: Fetch Dependabot metadata
         id: metadata
-        uses: dependabot/fetch-metadata@v3
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       # Auto-merge patch et minor uniquement — major nécessite une review manuelle
       - name: Approve and auto-merge
         if: steps.metadata.outputs.update-type != 'version-update:semver-major'
-        run: |
-          gh pr review "$PR_URL" --approve --body "Auto-approved (dependabot ${{ steps.metadata.outputs.update-type }})"
-          gh pr merge "$PR_URL" --auto --merge
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
+          UPDATE_TYPE: ${{ steps.metadata.outputs.update-type }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr review "$PR_URL" --approve --body "Auto-approved (dependabot ${UPDATE_TYPE})"
+          gh pr merge "$PR_URL" --auto --merge
